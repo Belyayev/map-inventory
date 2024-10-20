@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@clerk/nextjs";
 import Header from "./components/Header";
-import dbConnect from "./utils/dbConnect";
 import { LatLngTuple } from "leaflet"; // Import the LatLngTuple type
 
 // Dynamically import the MapComponent
@@ -19,18 +18,6 @@ export default function Home() {
     { position: [50.92275, -114.09211], info: "Object 2" },
     { position: [50.92429, -114.08978], info: "Object 3" },
   ]);
-
-  useEffect(() => {
-    const connectDb = async () => {
-      try {
-        await dbConnect();
-        console.log("Database connected");
-      } catch (error) {
-        console.error("Database connection error:", error);
-      }
-    };
-    connectDb();
-  }, []);
 
   if (!isLoaded) {
     return <div>Loading...</div>;
