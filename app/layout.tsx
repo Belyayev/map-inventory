@@ -6,8 +6,8 @@ import "./globals.css";
 dotenv.config();
 
 export const metadata: Metadata = {
-  title: "My map",
-  description: "My map free",
+  title: "Map Inventory",
+  description: "Add objects like inventory on the map",
 };
 
 export default function RootLayout({

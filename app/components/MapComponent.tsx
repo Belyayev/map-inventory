@@ -15,12 +15,13 @@ L.Icon.Default.mergeOptions({
 
 interface MapComponentProps {
   center: LatLngTuple;
+  coordinates: { position: LatLngTuple; info: string }[];
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ center }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ center, coordinates }) => {
   return (
     <MapContainer
-      key={center.toString()} // This forces the component to remount whenever center changes
+      key={center.toString()}
       center={center}
       zoom={13}
       style={{ height: "100vh", width: "100vw" }}
@@ -29,9 +30,21 @@ const MapComponent: React.FC<MapComponentProps> = ({ center }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={center}>
-        <Popup>Office at church</Popup>
-      </Marker>
+      {coordinates.map((coord, idx) => (
+        <Marker key={idx} position={coord.position}>
+          <Popup>
+            {coordinates
+              .filter(
+                (c) =>
+                  c.position[0] === coord.position[0] &&
+                  c.position[1] === coord.position[1]
+              )
+              .map((c, i) => (
+                <div key={i}>{c.info}</div>
+              ))}
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 };

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@clerk/nextjs";
 import dbConnect from "./utils/dbConnect";
@@ -11,10 +11,19 @@ const MapComponent = dynamic(() => import("./components/MapComponent"), {
 
 export default function Home() {
   const { isLoaded } = useAuth();
+  const [coordinates, setCoordinates] = useState<
+    { position: [number, number]; info: string }[]
+  >([
+    { position: [50.92275, -114.09211], info: "Object 1" },
+    { position: [50.92275, -114.09211], info: "Object 2" },
+    { position: [50.92429, -114.08978], info: "Object 3" },
+    // Add more objects as needed
+  ]);
 
   useEffect(() => {
     const connectDb = async () => {
       await dbConnect();
+      // Future fetching of coordinates from database can go here
     };
     connectDb();
   }, []);
@@ -27,7 +36,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
-      <MapComponent center={center} />
+      <MapComponent center={center} coordinates={coordinates} />
     </div>
   );
 }
