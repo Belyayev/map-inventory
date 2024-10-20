@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@clerk/nextjs";
 import dbConnect from "./utils/dbConnect";
+import Header from "./components/Header";
 
 // Dynamically import the MapComponent
 const MapComponent = dynamic(() => import("./components/MapComponent"), {
@@ -32,10 +33,11 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
-  const center: [number, number] = [50.92215, -114.09333]; // Shell gas station in Calgary, AB
+  const center: [number, number] = [50.92215, -114.09333];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
+    <div className="mainApp">
+      <Header />
       <MapComponent center={center} coordinates={coordinates} />
     </div>
   );

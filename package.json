@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.7.3",
+    "@clerk/nextjs": "^5.7.5",
     "@react-google-maps/api": "^2.20.3",
     "dotenv": "^16.4.5",
     "leaflet": "^1.9.4",
