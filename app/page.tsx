@@ -11,7 +11,7 @@ const MapComponent = dynamic(() => import("./components/MapComponent"), {
 
 export default function Home() {
   const { isLoaded } = useAuth();
-  const [coordinates, setCoordinates] = useState<
+  const [coordinates] = useState<
     { position: [number, number]; info: string }[]
   >([
     { position: [50.92275, -114.09211], info: "Object 1" },
