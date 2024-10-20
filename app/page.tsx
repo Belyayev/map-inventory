@@ -33,12 +33,14 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
-  const center: [number, number] = [50.92215, -114.09333];
+  const center: [number, number] = [50.92215, -114.09333]; // Shell gas station in Calgary, AB
 
   return (
-    <div className="mainApp">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <MapComponent center={center} coordinates={coordinates} />
+      <div className="map-container">
+        <MapComponent center={center} coordinates={coordinates} />
+      </div>
     </div>
   );
 }
