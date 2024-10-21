@@ -11,6 +11,15 @@ interface SidebarOrganizationsProps {
   userEmail: string;
 }
 
+interface Organization {
+  _id: string;
+  organizationName: string;
+  latitude: number;
+  longitude: number;
+  description: string;
+  admins: string[];
+}
+
 const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
   userEmail,
 }) => {
@@ -19,7 +28,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
   const [longitude, setLongitude] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [newAdminEmail, setNewAdminEmail] = React.useState("");
-  const [organizations, setOrganizations] = React.useState([]);
+  const [organizations, setOrganizations] = React.useState<Organization[]>([]);
   const [admins, setAdmins] = React.useState<string[]>([userEmail]);
   const [buttonLabel, setButtonLabel] = React.useState("Create");
 
