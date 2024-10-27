@@ -36,7 +36,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
           setAdmins(data.admins);
         } else {
           const newOrg = {
-            _id: "",
+            _id: undefined,
             organizationName: "",
             owner: "",
             latitude: 0,
