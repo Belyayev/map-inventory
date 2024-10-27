@@ -1,10 +1,11 @@
 import * as React from "react";
 import { LatLngTuple } from "leaflet";
-import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, Marker, Circle } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { OrganizationType } from "../types/organization";
 import { InventoryType } from "../types/inventory"; // Import the InventoryType interface
+import { LocationType } from "../types/location";
 
 interface MapComponentProps {
   organization: OrganizationType | null;
@@ -12,6 +13,9 @@ interface MapComponentProps {
 
 const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
   const [inventory, setInventory] = React.useState<InventoryType[]>([]);
+  const [locations, setLocations] = React.useState<LocationType[]>([]);
+  const [showLocations, setShowLocations] = React.useState(false);
+  const [showInventory, setShowInventory] = React.useState(true);
 
   React.useEffect(() => {
     if (organization?._id) {
@@ -20,6 +24,12 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
       )
         .then((response) => response.json())
         .then((data) => setInventory(data));
+
+      fetch(
+        `/api/locations/getLocationsByOrganization?organizationId=${organization._id}`
+      )
+        .then((response) => response.json())
+        .then((data) => setLocations(data));
     }
   }, [organization?._id]);
 
@@ -59,6 +69,42 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
 
   return (
     <div className="map-container">
+      <div
+        style={{
+          position: "absolute",
+          top: "4.5rem",
+          left: "3.5rem",
+          zIndex: 1000,
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+        }}
+      >
+        <button
+          onClick={() => setShowLocations(!showLocations)}
+          style={{
+            padding: "5px",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            fontSize: "12px",
+          }}
+        >
+          {showLocations ? "Hide Locations" : "Show Locations"}
+        </button>
+        <button
+          onClick={() => setShowInventory(!showInventory)}
+          style={{
+            padding: "5px",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            fontSize: "12px",
+          }}
+        >
+          {showInventory ? "Hide Inventory" : "Show Inventory"}
+        </button>
+      </div>
       <MapContainer
         key={center.toString()}
         center={center}
@@ -69,26 +115,40 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {clusters.map((cluster, idx) => {
-          const icon = L.divIcon({
-            html: `<div style="background-color: lime; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 25px">${cluster.count}</div>`,
-            className: "",
-          });
+        {showInventory &&
+          clusters.map((cluster, idx) => {
+            const icon = L.divIcon({
+              html: `<div style="background-color: lime; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 25px">${cluster.count}</div>`,
+              className: "",
+            });
 
-          return (
-            <Marker key={idx} position={cluster.position} icon={icon}>
-              <Popup>
-                <div>
-                  <ul>
-                    {cluster.items.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
+            return (
+              <Marker key={idx} position={cluster.position} icon={icon}>
+                <Popup>
+                  <div>
+                    <ul>
+                      {cluster.items.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+        {showLocations &&
+          locations.map((location, idx) => (
+            <Circle
+              key={idx}
+              center={[location.latitude, location.longitude] as LatLngTuple}
+              radius={200} // Adjust the radius as needed
+              pathOptions={{
+                color: "transparent",
+                fillColor: "blue",
+                fillOpacity: 0.2, // Adjust the opacity as needed
+              }}
+            />
+          ))}
       </MapContainer>
     </div>
   );

@@ -8,6 +8,7 @@ import SidebarOrganizations from "./SidebarOrganizations";
 import "./sidebar.css";
 import SidebarInventory from "./SidebarInventory";
 import { OrganizationType } from "../types/organization";
+import SidebarLocations from "./SidebarLocations";
 
 interface SidebarProps {
   open: boolean;
@@ -29,6 +30,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           <ListItemText primary={`User: ${userEmail}`} />
         </ListItem>
         <SidebarOrganizations userEmail={userEmail} />
+        {organization && (
+          <SidebarLocations userEmail={userEmail} organization={organization} />
+        )}
         {organization && (
           <SidebarInventory userEmail={userEmail} organization={organization} />
         )}
