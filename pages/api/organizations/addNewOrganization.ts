@@ -1,9 +1,10 @@
+import { OrganizationType } from "@/app/types/organization";
 import connectToDatabase from "@/app/utils/dbConnect";
 import dayjs from "dayjs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 async function addNewOrganization(req: NextApiRequest, res: NextApiResponse) {
-  const organizationData = req.body;
+  const organizationData: OrganizationType = req.body;
 
   const organizationName = organizationData.organizationName;
 
@@ -21,6 +22,7 @@ async function addNewOrganization(req: NextApiRequest, res: NextApiResponse) {
       {
         $set: {
           organizationName: organizationData.organizationName,
+          owner: organizationData.owner,
           latitude: organizationData.latitude,
           longitude: organizationData.longitude,
           description: organizationData.description,
@@ -34,8 +36,7 @@ async function addNewOrganization(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  organizationData.patientIsApproved = true;
-  organizationData.userLastUpdated = dayjs().format("DD MMM, YYYY HH:mm");
+  organizationData.lastUpdated = dayjs().format("DD MMM, YYYY HH:mm");
   const response = await db
     .collection("organizations")
     .insertOne(organizationData);

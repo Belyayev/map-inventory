@@ -27,11 +27,6 @@ interface DynamicPageProps {
 
 const DynamicPage: React.FC<DynamicPageProps> = ({ params }) => {
   const { isLoaded } = useAuth();
-  const [coordinates] = useState<{ position: LatLngTuple; info: string }[]>([
-    { position: [50.92275, -114.09211], info: "Object 1" },
-    { position: [50.92275, -114.09211], info: "Object 2" },
-    { position: [50.92429, -114.08978], info: "Object 3" },
-  ]);
   const [organization, setOrganization] = useState<OrganizationType | null>(
     null
   );
@@ -80,17 +75,11 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ params }) => {
     );
   }
 
-  const center: LatLngTuple = [50.92215, -114.09333]; // Shell gas station in Calgary, AB
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header organization={organization} />
       <div className="map-container">
-        <MapComponent
-          center={center}
-          coordinates={coordinates}
-          organization={organization}
-        />
+        <MapComponent organization={organization} />
       </div>
     </div>
   );

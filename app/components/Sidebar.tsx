@@ -29,8 +29,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           <ListItemText primary={`User: ${userEmail}`} />
         </ListItem>
         <SidebarOrganizations userEmail={userEmail} />
-
-        <SidebarInventory userEmail={userEmail} organization={organization} />
+        {organization && (
+          <SidebarInventory userEmail={userEmail} organization={organization} />
+        )}
       </List>
     </Drawer>
   );

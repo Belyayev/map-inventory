@@ -1,35 +1,60 @@
+import * as React from "react";
 import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { OrganizationType } from "../types/organization";
+import { InventoryType } from "../types/inventory"; // Import the InventoryType interface
 
 interface MapComponentProps {
-  center: LatLngTuple;
-  coordinates: { position: LatLngTuple; info: string }[];
   organization: OrganizationType | null;
 }
 
-const getClusterData = (
-  coordinates: { position: LatLngTuple; info: string }[]
-) => {
-  const clusters: {
-    [key: string]: { position: LatLngTuple; count: number; items: string[] };
-  } = {};
+const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
+  const [inventory, setInventory] = React.useState<InventoryType[]>([]);
 
-  coordinates.forEach((coord) => {
-    const key = `${coord.position[0]}-${coord.position[1]}`;
-    if (!clusters[key]) {
-      clusters[key] = { position: coord.position, count: 0, items: [] };
+  React.useEffect(() => {
+    if (organization?._id) {
+      fetch(
+        `/api/inventory/getInventoryByOrganization?organizationId=${organization._id}`
+      )
+        .then((response) => response.json())
+        .then((data) => setInventory(data));
     }
-    clusters[key].count += 1;
-    clusters[key].items.push(coord.info);
-  });
+  }, [organization?._id]);
 
-  return Object.values(clusters);
-};
+  const center: LatLngTuple = [
+    organization?.latitude || 40.7128,
+    organization?.longitude || -74.006, // Set coordinates of New York city by default
+  ];
 
-const MapComponent: React.FC<MapComponentProps> = ({ center, coordinates }) => {
+  const getClusterData = (
+    coordinates: { position: LatLngTuple; info: string }[]
+  ) => {
+    const clusters: {
+      [key: string]: { position: LatLngTuple; count: number; items: string[] };
+    } = {};
+
+    coordinates.forEach((coord) => {
+      const key = `${coord.position[0]}-${coord.position[1]}`;
+      if (!clusters[key]) {
+        clusters[key] = { position: coord.position, count: 0, items: [] };
+      }
+      clusters[key].count += 1;
+      clusters[key].items.push(coord.info);
+    });
+
+    return Object.values(clusters);
+  };
+
+  // Ensure inventory is an array before mapping
+  const coordinates = Array.isArray(inventory)
+    ? inventory.map((item) => ({
+        position: [item.latitude, item.longitude] as LatLngTuple,
+        info: item.inventoryName,
+      }))
+    : [];
+
   const clusters = getClusterData(coordinates);
 
   return (
