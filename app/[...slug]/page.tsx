@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@clerk/nextjs";
 import Header from "../../app/components/Header"; // Adjust the path based on your directory structure
-import { LatLngTuple } from "leaflet"; // Import the LatLngTuple type
 import { OrganizationType } from "../types/organization";
 
 const MapComponent = dynamic(
