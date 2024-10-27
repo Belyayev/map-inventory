@@ -2,10 +2,12 @@ import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { OrganizationType } from "../types/organization";
 
 interface MapComponentProps {
   center: LatLngTuple;
   coordinates: { position: LatLngTuple; info: string }[];
+  organization: OrganizationType | null;
 }
 
 const getClusterData = (
