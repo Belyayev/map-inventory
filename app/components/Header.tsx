@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useAuth, UserButton, SignInButton } from "@clerk/nextjs";
 import Sidebar from "./Sidebar";
+import { OrganizationType } from "@/app/types/organization";
 
 type HeaderProps = {
-  organization: any;
+  organization: OrganizationType | null;
 };
 
 const Header: React.FC<HeaderProps> = ({ organization }) => {

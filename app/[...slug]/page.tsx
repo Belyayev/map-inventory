@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@clerk/nextjs";
 import Header from "../../app/components/Header"; // Adjust the path based on your directory structure
 import { LatLngTuple } from "leaflet"; // Import the LatLngTuple type
+import { OrganizationType } from "../types/organization";
 
 const MapComponent = dynamic(
   () => import("../../app/components/MapComponent"),
@@ -25,7 +26,9 @@ const DynamicPage = ({ params }) => {
     { position: [50.92275, -114.09211], info: "Object 2" },
     { position: [50.92429, -114.08978], info: "Object 3" },
   ]);
-  const [organization, setOrganization] = useState(null);
+  const [organization, setOrganization] = useState<OrganizationType | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

@@ -1,4 +1,4 @@
-export interface Organization {
+export interface OrganizationType {
   _id: string;
   organizationName: string;
   owner: string; // who created the organization
