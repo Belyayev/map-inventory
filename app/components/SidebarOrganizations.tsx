@@ -82,37 +82,19 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
     setAdmins(admins.filter((email) => email !== emailToRemove));
   };
 
-  const handleOrganizationNameChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (organization) {
-      setOrganization({ ...organization, organizationName: e.target.value });
-    }
-  };
-
-  const handleLatitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (organization) {
-      setOrganization({
-        ...organization,
-        latitude: parseFloat(e.target.value),
-      });
-    }
-  };
-
-  const handleLongitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (organization) {
-      setOrganization({
-        ...organization,
-        longitude: parseFloat(e.target.value),
-      });
-    }
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (organization) {
-      setOrganization({ ...organization, description: e.target.value });
-    }
-  };
+  const handleFieldChange =
+    (field: keyof OrganizationType) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (organization) {
+        setOrganization({
+          ...organization,
+          [field]:
+            field === "latitude" || field === "longitude"
+              ? parseFloat(e.target.value)
+              : e.target.value,
+        });
+      }
+    };
 
   const handleCreateOrUpdate = async () => {
     const data = {
@@ -201,7 +183,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
               fullWidth
               margin="dense"
               value={organization?.organizationName || ""}
-              onChange={handleOrganizationNameChange}
+              onChange={handleFieldChange("organizationName")}
             />
             <Box display="flex" justifyContent="space-between">
               <TextField
@@ -209,7 +191,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
                 variant="outlined"
                 margin="dense"
                 value={organization?.latitude || ""}
-                onChange={handleLatitudeChange}
+                onChange={handleFieldChange("latitude")}
                 style={{ marginRight: 8 }}
               />
               <TextField
@@ -217,7 +199,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
                 variant="outlined"
                 margin="dense"
                 value={organization?.longitude || ""}
-                onChange={handleLongitudeChange}
+                onChange={handleFieldChange("longitude")}
               />
             </Box>
             <TextField
@@ -228,7 +210,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
               multiline
               rows={2}
               value={organization?.description || ""}
-              onChange={handleDescriptionChange}
+              onChange={handleFieldChange("description")}
             />
             <Box display="flex" justifyContent="center" alignItems="center">
               <TextField
