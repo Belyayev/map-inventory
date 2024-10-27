@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useAuth, UserButton, SignInButton } from "@clerk/nextjs";
 import Sidebar from "./Sidebar";
 
-const Header: React.FC = () => {
+type HeaderProps = {
+  organization: any;
+};
+
+const Header: React.FC<HeaderProps> = ({ organization }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isLoaded, isSignedIn } = useAuth();
 
@@ -13,6 +17,7 @@ const Header: React.FC = () => {
   return (
     <div className="header">
       <h1>Map Inventory App</h1>
+      {organization && <h2>{organization.organizationName}</h2>}
       <div className="auth-buttons">
         {isLoaded && isSignedIn ? (
           <div style={{ display: "flex" }}>
