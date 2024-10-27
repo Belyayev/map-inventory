@@ -10,6 +10,7 @@ import { InventoryType } from "@/app/types/inventory"; // Import the InventoryTy
 
 interface SidebarInventoryProps {
   organization: OrganizationType | null;
+  userEmail: string;
 }
 
 const SidebarInventory: React.FC<SidebarInventoryProps> = ({
