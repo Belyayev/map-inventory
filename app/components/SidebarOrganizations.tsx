@@ -22,6 +22,9 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
   const [admins, setAdmins] = React.useState<string[]>([userEmail]);
   const [showCreateForm, setShowCreateForm] = React.useState(false);
   const [isEditMode, setIsEditMode] = React.useState(false);
+  const [originalOrganization, setOriginalOrganization] =
+    React.useState<OrganizationType | null>(null);
+  const [emailError, setEmailError] = React.useState("");
 
   React.useEffect(() => {
     fetch(`/api/organizations/getOrganizationByUser?userEmail=${userEmail}`)
@@ -29,9 +32,10 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
       .then((data) => {
         if (data) {
           setOrganization(data);
+          setOriginalOrganization(data); // Save the original organization details
           setAdmins(data.admins);
         } else {
-          setOrganization({
+          const newOrg = {
             _id: "",
             organizationName: "",
             owner: "",
@@ -39,7 +43,9 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
             longitude: 0,
             description: "",
             admins: [userEmail],
-          });
+          };
+          setOrganization(newOrg);
+          setOriginalOrganization(newOrg); // Save the original organization details
         }
       });
   }, [userEmail]);
@@ -55,9 +61,17 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
   const handleCancelEdit = () => {
     setIsEditMode(false);
     setShowCreateForm(false); // Hide the form when canceling edit
+    setOrganization(originalOrganization); // Reset organization state to original
+    setAdmins(originalOrganization?.admins || []); // Reset admins state to original
   };
 
   const handleAddAdmin = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newAdminEmail)) {
+      setEmailError("Invalid email address.");
+      return;
+    }
+    setEmailError("");
     if (newAdminEmail && !admins.includes(newAdminEmail)) {
       setAdmins([...admins, newAdminEmail]);
       setNewAdminEmail("");
@@ -89,6 +103,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
       alert(isEditMode ? "Update successful!" : "Create successful!");
       setShowCreateForm(false);
       setIsEditMode(false);
+      setOriginalOrganization(organization); // Update original organization details
     } else {
       alert("Failed to create or update organization.");
     }
@@ -121,7 +136,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
             <ListItemText primary={`Longitude: ${organization.longitude}`} />
           </Box>
           <ListItemText primary={`Description: ${organization.description}`} />
-          <div>Admins</div>
+          <ListItemText primary={`Organization admins:`} />
           <Box display="flex" flexWrap="wrap" mb={2}>
             {admins.map((email) => (
               <div key={email} className="admin-card">
@@ -203,7 +218,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
                 })
               }
             />
-            <Box display="flex" alignItems="center">
+            <Box display="flex" justifyContent="center" alignItems="center">
               <TextField
                 label="Add Admin Email"
                 variant="outlined"
@@ -211,16 +226,20 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
                 margin="dense"
                 value={newAdminEmail}
                 onChange={(e) => setNewAdminEmail(e.target.value)}
+                error={!!emailError}
+                helperText={emailError}
                 style={{ marginRight: 8 }}
               />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleAddAdmin}
-                style={{ height: "56px" }}
-              >
-                Add
-              </Button>
+
+              <div>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAddAdmin}
+                >
+                  Add
+                </Button>
+              </div>
             </Box>
             <Box display="flex" flexWrap="wrap" mt={2}>
               {admins.map((email) => (
