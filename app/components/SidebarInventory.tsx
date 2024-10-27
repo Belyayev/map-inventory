@@ -15,7 +15,6 @@ interface SidebarInventoryProps {
 }
 
 const SidebarInventory: React.FC<SidebarInventoryProps> = ({
-  userEmail,
   organization,
 }) => {
   const [inventory, setInventory] = React.useState<InventoryType[]>([]);
@@ -89,24 +88,33 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
   };
 
   return (
-    <div>
-      <h3>Inventory List</h3>
+    <ListItem className="organization-info">
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        width="100%"
+        alignItems="center"
+      >
+        <div>Inventory List</div>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={handleCreateInventory}
+        >
+          Add
+        </Button>
+      </Box>
       {inventory.length > 0 &&
         inventory.map((item) => (
           <ListItem key={item._id?.toString()}>
             <ListItemText
               primary={item.inventoryName}
-              secondary={`Latitude: ${item.latitude}, Longitude: ${item.longitude}, Description: ${item.description}`}
+              secondary={`Lat: ${item.latitude}, Long: ${item.longitude}, Description: ${item.description}`}
             />
           </ListItem>
         ))}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCreateInventory}
-      >
-        Add New
-      </Button>
+
       {showCreateForm && (
         <form className="create-inventory-form">
           <h3>Create New Inventory Item</h3>
@@ -165,7 +173,7 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
           </Box>
         </form>
       )}
-    </div>
+    </ListItem>
   );
 };
 

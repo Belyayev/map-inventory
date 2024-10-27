@@ -139,7 +139,6 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
               color="primary"
               size="small"
               onClick={handleEditOrganization}
-              style={{ height: "30px", marginLeft: "10px" }}
             >
               Update
             </Button>
