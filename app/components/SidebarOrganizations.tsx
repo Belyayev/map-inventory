@@ -7,6 +7,7 @@ import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
 import { OrganizationType } from "@/app/types/organization";
 import TextField from "@mui/material/TextField";
+import "./sidebar.css"; // Import the CSS file
 
 interface SidebarOrganizationsProps {
   userEmail: string;
@@ -20,6 +21,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
   const [newAdminEmail, setNewAdminEmail] = React.useState("");
   const [admins, setAdmins] = React.useState<string[]>([userEmail]);
   const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [isEditMode, setIsEditMode] = React.useState(false);
 
   React.useEffect(() => {
     fetch(`/api/organizations/getOrganizationByUser?userEmail=${userEmail}`)
@@ -46,6 +48,15 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
     setShowCreateForm(true);
   };
 
+  const handleEditOrganization = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setShowCreateForm(false); // Hide the form when canceling edit
+  };
+
   const handleAddAdmin = () => {
     if (newAdminEmail && !admins.includes(newAdminEmail)) {
       setAdmins([...admins, newAdminEmail]);
@@ -54,9 +65,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
   };
 
   const handleRemoveAdmin = (emailToRemove: string) => {
-    if (emailToRemove !== userEmail) {
-      setAdmins(admins.filter((email) => email !== emailToRemove));
-    }
+    setAdmins(admins.filter((email) => email !== emailToRemove));
   };
 
   const handleCreateOrUpdate = async () => {
@@ -77,32 +86,42 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
     });
 
     if (response.ok) {
-      alert("Create successful!");
+      alert(isEditMode ? "Update successful!" : "Create successful!");
       setShowCreateForm(false);
+      setIsEditMode(false);
     } else {
-      alert("Failed to create organization.");
+      alert("Failed to create or update organization.");
     }
   };
 
   return (
     <>
-      {organization && organization.organizationName ? (
+      {organization && organization.organizationName && !isEditMode ? (
         <ListItem className="organization-info">
-          <ListItemText primary="Your Organization Information" />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreateOrganization}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            width="100%"
+            alignItems="center"
           >
-            Update
-          </Button>
+            <ListItemText primary="Your Organization Information" />
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={handleEditOrganization}
+              style={{ height: "30px", marginLeft: "10px" }}
+            >
+              Update
+            </Button>
+          </Box>
           <ListItemText primary={`Name: ${organization.organizationName}`} />
           <Box display="flex" justifyContent="space-between" width="100%">
             <ListItemText primary={`Latitude: ${organization.latitude}`} />
             <ListItemText primary={`Longitude: ${organization.longitude}`} />
           </Box>
           <ListItemText primary={`Description: ${organization.description}`} />
-          <ListItemText primary={`Admins:`} />
+          <div>Admins</div>
           <Box display="flex" flexWrap="wrap" mb={2}>
             {admins.map((email) => (
               <div key={email} className="admin-card">
@@ -111,7 +130,7 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
             ))}
           </Box>
         </ListItem>
-      ) : (
+      ) : !isEditMode ? (
         <ListItem className="no-organization">
           <ListItemText primary="This user does not own any organizations" />
           <Button
@@ -122,11 +141,13 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
             Create Organization
           </Button>
         </ListItem>
-      )}
-      {showCreateForm && (
+      ) : null}
+      {(showCreateForm || isEditMode) && (
         <ListItem>
           <form className="create-organization-form">
-            <h3>Create New Organization</h3>
+            <h3>
+              {isEditMode ? "Update Organization" : "Create New Organization"}
+            </h3>
             <TextField
               label="Organization Name"
               variant="outlined"
@@ -201,14 +222,36 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
                 Add
               </Button>
             </Box>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCreateOrUpdate}
-              style={{ marginTop: "1rem" }}
-            >
-              Create
-            </Button>
+            <Box display="flex" flexWrap="wrap" mt={2}>
+              {admins.map((email) => (
+                <Chip
+                  key={email}
+                  label={email}
+                  onDelete={() => handleRemoveAdmin(email)}
+                  color="primary"
+                  variant="outlined"
+                  style={{ margin: 2 }}
+                />
+              ))}
+            </Box>
+            <Box display="flex" justifyContent="space-between" width="100%">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCreateOrUpdate}
+                style={{ marginTop: "1rem" }}
+              >
+                {isEditMode ? "Update" : "Create"}
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleCancelEdit}
+                style={{ marginTop: "1rem" }}
+              >
+                Cancel
+              </Button>
+            </Box>
           </form>
         </ListItem>
       )}
