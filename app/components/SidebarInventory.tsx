@@ -5,12 +5,10 @@ import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import "./sidebar.css"; // Import the CSS file
 import { OrganizationType } from "@/app/types/organization";
 import { InventoryType } from "@/app/types/inventory"; // Import the InventoryType interface
 
 interface SidebarInventoryProps {
-  userEmail: string;
   organization: OrganizationType | null;
 }
 
@@ -18,9 +16,10 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
   organization,
 }) => {
   const [inventory, setInventory] = React.useState<InventoryType[]>([]);
-  const [newInventoryItem, setNewInventoryItem] =
+  const [currentInventoryItem, setCurrentInventoryItem] =
     React.useState<InventoryType | null>(null);
-  const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [showForm, setShowForm] = React.useState(false);
+  const [isEditMode, setIsEditMode] = React.useState(false);
 
   React.useEffect(() => {
     if (organization?._id) {
@@ -34,8 +33,9 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
 
   const handleCreateInventory = () => {
     if (organization?._id) {
-      setShowCreateForm(true);
-      setNewInventoryItem({
+      setShowForm(true);
+      setIsEditMode(false);
+      setCurrentInventoryItem({
         _id: undefined,
         organizationId: organization._id.toString(), // Convert to string
         inventoryName: "",
@@ -49,12 +49,18 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
     }
   };
 
+  const handleEditInventory = (item: InventoryType) => {
+    setShowForm(true);
+    setIsEditMode(true);
+    setCurrentInventoryItem(item);
+  };
+
   const handleFieldChange =
     (field: keyof InventoryType) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (newInventoryItem) {
-        setNewInventoryItem({
-          ...newInventoryItem,
+      if (currentInventoryItem) {
+        setCurrentInventoryItem({
+          ...currentInventoryItem,
           [field]:
             field === "latitude" || field === "longitude"
               ? parseFloat(e.target.value)
@@ -64,15 +70,20 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
     };
 
   const handleSubmit = async () => {
-    if (!newInventoryItem) {
+    if (!currentInventoryItem) {
       alert("No inventory item to submit. Please try again.");
       return;
     }
 
-    const response = await fetch(`/api/inventory/createInventory`, {
-      method: "POST",
+    const url = isEditMode
+      ? `/api/inventory/updateInventory`
+      : `/api/inventory/createInventory`;
+    const method = isEditMode ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method: method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newInventoryItem),
+      body: JSON.stringify(currentInventoryItem),
     });
 
     if (response.ok) {
@@ -81,9 +92,10 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
       )
         .then((response) => response.json())
         .then((data) => setInventory(data));
-      setShowCreateForm(false);
+      setShowForm(false);
+      setIsEditMode(false);
     } else {
-      alert("Failed to create inventory item.");
+      alert(`Failed to ${isEditMode ? "update" : "create"} inventory item.`);
     }
   };
 
@@ -107,23 +119,36 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
       </Box>
       {inventory.length > 0 &&
         inventory.map((item) => (
-          <ListItem key={item._id?.toString()}>
+          <ListItem
+            key={item._id?.toString()}
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
             <ListItemText
               primary={item.inventoryName}
               secondary={`Lat: ${item.latitude}, Long: ${item.longitude}, Description: ${item.description}`}
             />
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => handleEditInventory(item)}
+            >
+              Edit
+            </Button>
           </ListItem>
         ))}
 
-      {showCreateForm && (
+      {showForm && (
         <form className="create-inventory-form">
-          <h3>Create New Inventory Item</h3>
+          <h3>
+            {isEditMode ? "Update Inventory Item" : "Create New Inventory Item"}
+          </h3>
           <TextField
             label="Inventory Name"
             variant="outlined"
             fullWidth
             margin="dense"
-            value={newInventoryItem?.inventoryName || ""}
+            value={currentInventoryItem?.inventoryName || ""}
             onChange={handleFieldChange("inventoryName")}
           />
           <Box display="flex" justifyContent="space-between">
@@ -131,7 +156,7 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
               label="Latitude"
               variant="outlined"
               margin="dense"
-              value={newInventoryItem?.latitude || ""}
+              value={currentInventoryItem?.latitude || ""}
               onChange={handleFieldChange("latitude")}
               style={{ marginRight: 8 }}
             />
@@ -139,7 +164,7 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
               label="Longitude"
               variant="outlined"
               margin="dense"
-              value={newInventoryItem?.longitude || ""}
+              value={currentInventoryItem?.longitude || ""}
               onChange={handleFieldChange("longitude")}
             />
           </Box>
@@ -150,7 +175,7 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
             margin="dense"
             multiline
             rows={2}
-            value={newInventoryItem?.description || ""}
+            value={currentInventoryItem?.description || ""}
             onChange={handleFieldChange("description")}
           />
           <Box display="flex" justifyContent="space-between" width="100%">
@@ -160,12 +185,12 @@ const SidebarInventory: React.FC<SidebarInventoryProps> = ({
               onClick={handleSubmit}
               style={{ marginTop: "1rem" }}
             >
-              Submit
+              {isEditMode ? "Update" : "Submit"}
             </Button>
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => setShowCreateForm(false)}
+              onClick={() => setShowForm(false)}
               style={{ marginTop: "1rem" }}
             >
               Cancel

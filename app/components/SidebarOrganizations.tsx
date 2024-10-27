@@ -7,7 +7,6 @@ import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
 import { OrganizationType } from "@/app/types/organization";
 import TextField from "@mui/material/TextField";
-import "./sidebar.css"; // Import the CSS file
 
 interface SidebarOrganizationsProps {
   userEmail: string;
