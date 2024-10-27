@@ -40,6 +40,11 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ params }) => {
 
   useEffect(() => {
     const slug = params.slug || [];
+    if (slug.length === 0) {
+      // Redirect to a default page if the slug is missing
+      router.push("/");
+      return;
+    }
     console.log("Current slug: ", slug); // Debugging
     const fetchOrganization = async () => {
       if (slug.length === 0) {
