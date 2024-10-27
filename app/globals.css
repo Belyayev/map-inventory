@@ -63,3 +63,17 @@ body {
   width: 100%;
   height: calc(100vh - 4rem); /* Adjusting height to account for header */
 }
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgb(146, 159, 168);
+}
+
+.loading-text {
+  color: rgb(35, 44, 63);
+  font-weight: bold;
+  font-size: 2rem; /* Adjust the size as needed */
+}

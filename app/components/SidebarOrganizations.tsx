@@ -6,18 +6,10 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
+import { Organization } from "@/app/types/organization";
 
 interface SidebarOrganizationsProps {
   userEmail: string;
-}
-
-interface Organization {
-  _id: string;
-  organizationName: string;
-  latitude: number;
-  longitude: number;
-  description: string;
-  admins: string[];
 }
 
 const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
