@@ -19,7 +19,13 @@ const MapComponent = dynamic(
   }
 );
 
-const DynamicPage = ({ params }) => {
+interface DynamicPageProps {
+  params: {
+    slug: string[];
+  };
+}
+
+const DynamicPage: React.FC<DynamicPageProps> = ({ params }) => {
   const { isLoaded } = useAuth();
   const [coordinates] = useState<{ position: LatLngTuple; info: string }[]>([
     { position: [50.92275, -114.09211], info: "Object 1" },
@@ -35,15 +41,12 @@ const DynamicPage = ({ params }) => {
   useEffect(() => {
     const slug = params.slug || [];
     console.log("Current slug: ", slug); // Debugging
-
     const fetchOrganization = async () => {
       if (slug.length === 0) {
         setLoading(false);
         return;
       }
-
       const orgName = slug[0]; // Assuming the orgName is the first part of the slug
-
       try {
         console.log("Fetching organization:", orgName); // Debugging
         const response = await fetch(`/api/organizations/${orgName}`);
@@ -61,7 +64,6 @@ const DynamicPage = ({ params }) => {
         setLoading(false);
       }
     };
-
     fetchOrganization();
   }, [params.slug, router]);
 
