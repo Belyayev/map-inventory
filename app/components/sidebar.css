@@ -1,0 +1,50 @@
+.organization-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: "Arial", sans-serif;
+  margin-bottom: 20px;
+}
+
+.organization-info .MuiListItemText-root {
+  width: 100%;
+}
+
+.organization-info .MuiBox-root {
+  width: 100%;
+}
+
+.no-organization {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: "Arial", sans-serif;
+  margin-bottom: 20px;
+}
+
+.create-organization-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: "Arial", sans-serif;
+}
+
+.create-organization-form h3 {
+  margin-bottom: 20px;
+}
+
+.create-organization-form .MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+.create-organization-form .MuiButton-root {
+  align-self: flex-start;
+}
+
+.admin-card {
+  background-color: rgb(202, 240, 212);
+  margin-right: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+}

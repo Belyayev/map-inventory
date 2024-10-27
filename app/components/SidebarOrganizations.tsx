@@ -88,23 +88,26 @@ const SidebarOrganizations: React.FC<SidebarOrganizationsProps> = ({
     <>
       {organization && organization.organizationName ? (
         <ListItem className="organization-info">
-          <ListItemText primary="Organization Information" />
+          <ListItemText primary="Your Organization Information" />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateOrganization}
+          >
+            Update
+          </Button>
           <ListItemText primary={`Name: ${organization.organizationName}`} />
-          <ListItemText primary={`Latitude: ${organization.latitude}`} />
-          <ListItemText primary={`Longitude: ${organization.longitude}`} />
+          <Box display="flex" justifyContent="space-between" width="100%">
+            <ListItemText primary={`Latitude: ${organization.latitude}`} />
+            <ListItemText primary={`Longitude: ${organization.longitude}`} />
+          </Box>
           <ListItemText primary={`Description: ${organization.description}`} />
-          <h4>Admins</h4>
+          <ListItemText primary={`Admins:`} />
           <Box display="flex" flexWrap="wrap" mb={2}>
             {admins.map((email) => (
-              <Chip
-                key={email}
-                label={email}
-                onDelete={() => handleRemoveAdmin(email)}
-                color="primary"
-                variant="outlined"
-                style={{ margin: 2 }}
-                disabled={email === userEmail}
-              />
+              <div key={email} className="admin-card">
+                {email}
+              </div>
             ))}
           </Box>
         </ListItem>

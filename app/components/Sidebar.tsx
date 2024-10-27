@@ -5,6 +5,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import SidebarOrganizations from "./SidebarOrganizations";
+import "./sidebar.css";
 
 interface SidebarProps {
   open: boolean;
