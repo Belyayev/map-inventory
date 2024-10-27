@@ -6,11 +6,19 @@ async function getOrganizationByName(
   res: NextApiResponse
 ) {
   const { orgName } = req.query;
+
+  // Ensure orgName is a string
+  if (typeof orgName !== "string") {
+    res.status(400).json({ message: "Invalid organization name" });
+    return;
+  }
+
   const client = await connectToDatabase();
   const db = client.db("FreeMap");
-  const organization = await db
-    .collection("organizations")
-    .findOne({ organizationName: orgName });
+
+  const organization = await db.collection("organizations").findOne({
+    organizationName: { $regex: new RegExp(orgName, "i") },
+  });
 
   if (!organization) {
     res.status(404).json({ message: "Organization not found" });
