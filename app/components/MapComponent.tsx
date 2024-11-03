@@ -20,6 +20,7 @@ import ContextMenu from "./ContextMenu";
 import "./map.css";
 import { DraggableMarkerProps } from "../types/draggableMarkerProps";
 import { MapEventsProps } from "../types/mapEventsProps";
+import { ObjectId } from "mongoose";
 
 interface MapComponentProps {
   organization: OrganizationType | null;
@@ -55,46 +56,27 @@ const DraggableMarker = ({
   );
 };
 
-const onMarkerDragEnd = (idx: number, newPos: unknown) => {
+const onMarkerDragEnd = (idx: number, id: ObjectId, newPos: unknown) => {
   console.log(idx);
   console.log(newPos);
+  console.log(id);
   // const updatedCoordinates = [...coordinates];
   // updatedCoordinates[idx].position = [newPos.lat, newPos.lng];
   // setCoordinates(updatedCoordinates);
 
-  // // Call your API to update the coordinates
-  // fetch(`/api/updateCoordinates`, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     id: coordinates[idx].id,
-  //     latitude: newPos.lat,
-  //     longitude: newPos.lng,
-  //   }),
-  // });
+  // Call your API to update the coordinates
+  fetch(`/api/inventory/relocateInventory`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: id,
+      latitude: newPos.lat,
+      longitude: newPos.lng,
+    }),
+  });
 };
-
-// const ContextMenu = ({ position, onAddInventory, onAddLocation }) => {
-//   return (
-//     <div
-//       style={{
-//         position: "absolute",
-//         display: "flex",
-//         flexDirection: "column",
-//         top: position.y,
-//         left: position.x,
-//         backgroundColor: "white",
-//         border: "1px solid #ccc",
-//         zIndex: 1000,
-//       }}
-//     >
-//       <button onClick={onAddInventory}>Add Inventory</button>
-//       <button onClick={onAddLocation}>Add Location</button>
-//     </div>
-//   );
-// };
 
 const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
   const [contextMenu, setContextMenu] = React.useState<ContextMenuType | null>(
@@ -160,6 +142,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
   // Ensure inventory is an array before mapping
   const coordinates = Array.isArray(inventory)
     ? inventory.map((item) => ({
+        id: item._id,
         position: [item.latitude, item.longitude] as LatLngTuple,
         info: item.inventoryName,
       }))
@@ -226,7 +209,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
                 position={coord.position}
                 info={coord.info}
                 color="lime"
-                onDragEnd={(newPos: unknown) => onMarkerDragEnd(idx, newPos)}
+                onDragEnd={(newPos: unknown) =>
+                  onMarkerDragEnd(idx, coord.id, newPos)
+                }
               />
             ))}
           </MarkerClusterGroup>

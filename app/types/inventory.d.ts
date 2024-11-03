@@ -9,3 +9,9 @@ export interface InventoryType {
   description: string;
   lastUpdated?: string; // Optional if you set it server-side
 }
+
+export interface InventoryRelocateType {
+  id: ObjectId;
+  latitude: number;
+  longitude: number;
+}
