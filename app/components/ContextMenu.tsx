@@ -1,11 +1,16 @@
 import React, { useEffect, useRef } from "react";
 
-const ContextMenu = ({ position, onAddInventory, onAddLocation, onClose }) => {
-  const menuRef = useRef(null);
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  position,
+  onAddInventory,
+  onAddLocation,
+  onClose,
+}) => {
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         onClose();
       }
     };
