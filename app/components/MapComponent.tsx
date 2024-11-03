@@ -1,11 +1,20 @@
 import * as React from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Popup,
+  CircleMarker,
+  useMapEvents,
+} from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 import { LatLngTuple } from "leaflet";
-import { MapContainer, TileLayer, Popup, Marker, Circle } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { OrganizationType } from "../types/organization";
 import { InventoryType } from "../types/inventory"; // Import the InventoryType interface
 import { LocationType } from "../types/location";
+import "./map.css";
 
 interface MapComponentProps {
   organization: OrganizationType | null;
@@ -16,6 +25,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
   const [locations, setLocations] = React.useState<LocationType[]>([]);
   const [showLocations, setShowLocations] = React.useState(false);
   const [showInventory, setShowInventory] = React.useState(true);
+  const [zoom, setZoom] = React.useState(13);
 
   React.useEffect(() => {
     if (organization?._id) {
@@ -38,25 +48,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
     organization?.longitude || -74.006, // Set coordinates of New York city by default
   ];
 
-  const getClusterData = (
-    coordinates: { position: LatLngTuple; info: string }[]
-  ) => {
-    const clusters: {
-      [key: string]: { position: LatLngTuple; count: number; items: string[] };
-    } = {};
-
-    coordinates.forEach((coord) => {
-      const key = `${coord.position[0]}-${coord.position[1]}`;
-      if (!clusters[key]) {
-        clusters[key] = { position: coord.position, count: 0, items: [] };
-      }
-      clusters[key].count += 1;
-      clusters[key].items.push(coord.info);
-    });
-
-    return Object.values(clusters);
-  };
-
   // Ensure inventory is an array before mapping
   const coordinates = Array.isArray(inventory)
     ? inventory.map((item) => ({
@@ -65,7 +56,18 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
       }))
     : [];
 
-  const clusters = getClusterData(coordinates);
+  const MapEvents = () => {
+    useMapEvents({
+      zoomend: (e) => {
+        setZoom(e.target.getZoom());
+      },
+    });
+    return null;
+  };
+
+  const getRadius = (zoomLevel: number) => {
+    return zoomLevel * 1.5; // Adjust the multiplier as needed
+  };
 
   return (
     <div className="map-container">
@@ -108,46 +110,42 @@ const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
       <MapContainer
         key={center.toString()}
         center={center}
-        zoom={13}
+        zoom={zoom}
         style={{ height: "100%", width: "100%" }}
       >
+        <MapEvents />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='<a href="https://belyayev.vercel.app">developed by:</a>'
         />
-        {showInventory &&
-          clusters.map((cluster, idx) => {
-            const icon = L.divIcon({
-              html: `<div style="background-color: lime; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 25px">${cluster.count}</div>`,
-              className: "",
-            });
-
-            return (
-              <Marker key={idx} position={cluster.position} icon={icon}>
-                <Popup>
-                  <div>
-                    <ul>
-                      {cluster.items.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
+        {showInventory && (
+          <MarkerClusterGroup>
+            {coordinates.map((coord, idx) => (
+              <CircleMarker
+                key={idx}
+                center={coord.position}
+                radius={getRadius(zoom)}
+                color="green"
+                fillColor="lime"
+                fillOpacity={0.5}
+              >
+                <Popup>{coord.info}</Popup>
+              </CircleMarker>
+            ))}
+          </MarkerClusterGroup>
+        )}
         {showLocations &&
           locations.map((location, idx) => (
-            <Circle
+            <CircleMarker
               key={idx}
               center={[location.latitude, location.longitude] as LatLngTuple}
-              radius={200} // Adjust the radius as needed
-              pathOptions={{
-                color: "transparent",
-                fillColor: "blue",
-                fillOpacity: 0.2, // Adjust the opacity as needed
-              }}
-            />
+              radius={getRadius(zoom)}
+              color="blue"
+              fillColor="blue"
+              fillOpacity={0.5}
+            >
+              <Popup>{location.locationName}</Popup>
+            </CircleMarker>
           ))}
       </MapContainer>
     </div>
