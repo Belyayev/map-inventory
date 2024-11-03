@@ -97,7 +97,9 @@ const onMarkerDragEnd = (idx: number, newPos: unknown) => {
 // };
 
 const MapComponent: React.FC<MapComponentProps> = ({ organization }) => {
-  const [contextMenu, setContextMenu] = React.useState(null);
+  const [contextMenu, setContextMenu] = React.useState<ContextMenuType | null>(
+    null
+  );
   const [inventory, setInventory] = React.useState<InventoryType[]>([]);
   const [locations, setLocations] = React.useState<LocationType[]>([]);
   const [showLocations, setShowLocations] = React.useState(false);
